@@ -21,10 +21,11 @@ def create_order(order_data: order_schema.OrderCreate,
     print("Creating order request received")
     print(order_data)
     
-    # Validate that the event exists and is active
-    # You might want to add this validation in your core logic
     
     db_order = order.create_order(db, order_data, current_user.id)
+
+    
+
     return db_order
 
 

@@ -18,6 +18,7 @@ class UserLogin(BaseModel):
 class User(UserBase):
     id: int
     created_at: datetime
+    current_balance: int
 
     class Config:
         from_attributes = True

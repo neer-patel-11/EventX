@@ -18,13 +18,13 @@ def create_event(event_data: event_schema.EventCreate,
                  current_user: user_schema.User = Depends(auth.get_current_user),
                  db: Session = Depends(get_db)):
 
-    print("got the request")
+    """Create a event """
     if current_user.is_admin == False:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admin can add Events"
         )
-    print(event_data)
+    # print(event_data)
     
     db_event = event_model.Event(
         **event_data.dict(),
@@ -34,6 +34,9 @@ def create_event(event_data: event_schema.EventCreate,
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
+
+    
+
     return db_event
 
 

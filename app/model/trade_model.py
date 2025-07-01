@@ -18,6 +18,6 @@ class Trade(Base):
     executed_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
-    event = relationship("Event", back_populates="trades")
-    buyer = relationship("User", foreign_keys=[buyer_user_id], back_populates="bought_trades")
-    seller = relationship("User", foreign_keys=[seller_user_id], back_populates="sold_trades")
+    event = relationship("Event")
+    buyer = relationship("User", foreign_keys=[buyer_user_id])
+    seller = relationship("User", foreign_keys=[seller_user_id])

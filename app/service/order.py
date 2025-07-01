@@ -68,6 +68,9 @@ def create_order(db: Session, order_data: order_schema.OrderCreate, user_id: int
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
+
+    
+
     return db_order
 
 def update_order(db: Session, order_id: int, order_update: order_schema.OrderUpdate):

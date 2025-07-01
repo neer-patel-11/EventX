@@ -33,7 +33,8 @@ def register_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
         username=user.username,
         email=user.email,
         hashed_password=hashed_password,
-        is_admin= user.is_admin
+        is_admin= user.is_admin,
+        current_balance=0
     )
     db.add(db_user)
     db.commit()
