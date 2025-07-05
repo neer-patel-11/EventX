@@ -10,6 +10,8 @@ class TradeBase(BaseModel):
     type_of_share: trade_enums.TradeShareType
     buyer_user_id: int
     seller_user_id: int
+    buyer_order_id:int
+    seller_order_id:int
 
 class TradeCreate(TradeBase):
     # Used internally by the trading engine - not exposed to users directly
@@ -23,6 +25,8 @@ class TradeUpdate(BaseModel):
     type_of_share: Optional[trade_enums.TradeShareType] = None
     buyer_user_id: Optional[int] = None
     seller_user_id: Optional[int] = None
+    buyer_order_id:Optional[int] = None
+    seller_order_id:Optional[int] = None
 
 class Trade(TradeBase):
     # Response schema - includes auto-generated fields
@@ -36,6 +40,8 @@ class TradeWithRelations(Trade):
     event: "Event"  # Forward reference to Event schema
     buyer: "User"   # Forward reference to User schema
     seller: "User"  # Forward reference to User schema
+    buy_order:"Order"
+    sell_order:"Order"
     
     class Config:
         from_attributes = True
@@ -49,6 +55,8 @@ class TradeResponse(BaseModel):
     type_of_share: trade_enums.TradeShareType
     buyer_user_id: int
     seller_user_id: int
+    buyer_order_id:int
+    seller_order_id:int
     executed_at: datetime
     
     class Config:

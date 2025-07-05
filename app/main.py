@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .model import user_model
 from .database import engine, get_db
-from .routes import auth , event , portfolio , trade ,order
+from .routes import auth , event , portfolio , trade ,order , user , orderbook
 from .service import auth as auth_module
 
 # Create database tables
@@ -30,6 +30,9 @@ app.include_router(event.router)
 app.include_router(portfolio.router)
 app.include_router(trade.router)
 app.include_router(order.router)
+app.include_router(user.router)
+app.include_router(orderbook.router)
+
 
 
 

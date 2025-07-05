@@ -15,9 +15,13 @@ class Trade(Base):
     type_of_share = Column(Enum(trade_enums.TradeShareType), nullable=False)
     buyer_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     seller_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    buyer_order_id = Column(Integer, ForeignKey("orders.id"), nullable=False)
+    seller_order_id = Column(Integer, ForeignKey("orders.id"), nullable=False)
     executed_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
     event = relationship("Event")
     buyer = relationship("User", foreign_keys=[buyer_user_id])
     seller = relationship("User", foreign_keys=[seller_user_id])
+    buy_order = relationship("Order", foreign_keys=[buyer_order_id])
+    sell_order = relationship("Order", foreign_keys=[seller_order_id])

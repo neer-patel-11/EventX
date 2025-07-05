@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from ..schemas import order_schema, user_schema
 from ..model import order_model
-from ..service import auth, order
+from ..service import auth, order , orderbook
 from ..database import get_db
 
 
@@ -18,14 +18,18 @@ def create_order(order_data: order_schema.OrderCreate,
                  current_user: user_schema.User = Depends(auth.get_current_user),
                  db: Session = Depends(get_db)):
 
-    print("Creating order request received")
-    print(order_data)
+    # print("Creating order request received")
+    # print(order_data)
     
     
     db_order = order.create_order(db, order_data, current_user.id)
 
-    
+    result = orderbook.addOrder(db_order)
 
+    if result == False:
+        order.delete_order(db,db_order.id)
+        return HTTPException("Not able to place the order")
+    
     return db_order
 
 

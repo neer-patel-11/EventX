@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
 
-from ..enums import potfolio_enums
+from ..enums import portfolio_enums
 from ..model import portfolio_model
 from ..schemas import portfolio_schema
 
-def get_portfolio_by_user_event_share(db: Session, user_id: int, event_id: int, share_type: potfolio_enums.ShareType):
+def get_portfolio_by_user_event_share(db: Session, user_id: int, event_id: int, share_type: portfolio_enums.ShareType):
     """Get portfolio entry by user ID, event ID, and share type"""
     return db.query(portfolio_model.Portfolio).filter(
         portfolio_model.Portfolio.user_id == user_id,
@@ -29,6 +29,7 @@ def get_portfolios_by_event(db: Session, event_id: int):
     return db.query(portfolio_model.Portfolio).filter(
         portfolio_model.Portfolio.event_id == event_id
     ).all()
+
 
 def create_portfolio(db: Session, portfolio_data: portfolio_schema.PortfolioCreate, user_id: int):
     """Create a new portfolio entry"""

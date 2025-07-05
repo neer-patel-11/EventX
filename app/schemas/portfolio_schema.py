@@ -1,24 +1,24 @@
 from pydantic import BaseModel
 from typing import Optional
-from ..enums import potfolio_enums
+from ..enums import portfolio_enums
 
 class PortfolioBase(BaseModel):
     user_id: int
     event_id: int
     quantity: int 
-    type_of_share: potfolio_enums.ShareType
+    type_of_share: portfolio_enums.ShareType
 
 class PortfolioCreate(BaseModel):
     event_id: int
     quantity: int 
-    type_of_share: potfolio_enums.ShareType
+    type_of_share: portfolio_enums.ShareType
     
 
 class PortfolioUpdate(BaseModel):
     user_id: Optional[int] = None
     event_id: Optional[int] = None
     quantity: Optional[int] = None
-    type_of_share: Optional[potfolio_enums.ShareType] = None
+    type_of_share: Optional[portfolio_enums.ShareType] = None
 
 class Portfolio(PortfolioBase):
     # Response schema - includes auto-generated fields
@@ -40,7 +40,7 @@ class PortfolioResponse(BaseModel):
     user_id: int
     event_id: int
     quantity: int
-    type_of_share: potfolio_enums.ShareType
+    type_of_share: portfolio_enums.ShareType
     
     class Config:
         from_attributes = True

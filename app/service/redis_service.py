@@ -144,6 +144,17 @@ def addToMap(order, id: int) -> bool:
     except Exception as e:
         print(f"Error adding order to map with ID {id}: {e}")
         return False
+    
+def updateMap(order, id: int) -> bool:
+    """Add an Order object to the map with given ID"""
+    try:
+        map_key = _get_map_key(id)
+        order_data = pickle.dumps(order)
+        redis_client.set(map_key, order_data)
+        return True
+    except Exception as e:
+        print(f"Error adding order to map with ID {id}: {e}")
+        return False
 
 def getFromMap(id: int):
     """Get an Order object from the map by ID"""
@@ -160,6 +171,18 @@ def getFromMap(id: int):
         return None
     
 
+
+def removeFromMap(id: int) -> bool:
+    """Remove an Order object from the map by ID"""
+    try:
+        map_key = _get_map_key(id)
+        result = redis_client.delete(map_key)
+        
+        # Redis delete returns the number of keys deleted (0 or 1 in this case)
+        return result > 0
+    except Exception as e:
+        print(f"Error removing order from map with ID {id}: {e}")
+        return False
 
 
 # class MockOrder:
