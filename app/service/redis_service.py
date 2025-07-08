@@ -133,6 +133,34 @@ def isQueueEmpty(queue_name: str) -> bool:
         print(f"Error checking if queue {queue_name} is empty: {e}")
         return True
     
+def freeQueue(queue_name: str) -> bool:
+    """
+    Free a queue by removing its lock and clearing all items from the queue.
+    
+    Args:
+        queue_name (str): Name of the queue to free
+        
+    Returns:
+        bool: True if queue was successfully freed, False otherwise
+    """
+    try:
+        # Step 1: Remove the lock if it exists
+        lock_removed = removeLock(queue_name)
+        
+        # Step 2: Clear all items from the queue
+        queue_key = _get_queue_key(queue_name)
+        items_removed = redis_client.delete(queue_key)
+        
+        if lock_removed or items_removed > 0:
+            print(f"Queue {queue_name} freed successfully. Lock removed: {lock_removed}, Items cleared: {items_removed}")
+            return True
+        else:
+            print(f"Queue {queue_name} was already free or empty")
+            return True
+            
+    except Exception as e:
+        print(f"Error freeing queue {queue_name}: {e}")
+        return False
 
 def addToMap(order, id: int) -> bool:
     """Add an Order object to the map with given ID"""

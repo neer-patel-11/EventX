@@ -49,6 +49,60 @@ class ConnectionManager:
             for connection in connections_to_remove:
                 self.disconnect(connection, event_id)
 
+    async def close_event_connections(self, event_id: int, reason: str = "Event completed"):
+        """
+        Close all connections for a specific event
+        """
+        if event_id in self.active_connections:
+            # Send final message to all connections
+            final_message = json.dumps({
+                "type": "event_closed",
+                "event_id": event_id,
+                "reason": reason,
+                "timestamp": datetime.now().isoformat()
+            })
+            
+            connections_to_close = list(self.active_connections[event_id])
+            
+            for connection in connections_to_close:
+                try:
+                    # Send final message
+                    await connection.send_text(final_message)
+                    # Close the connection
+                    await connection.close()
+                except:
+                    pass
+                    
+            # Clear the connections list for this event
+            del self.active_connections[event_id]
+            
+    async def close_all_connections(self, reason: str = "System shutdown"):
+        """
+        Close all active connections across all events
+        """
+        # Send final message to all connections
+        final_message = json.dumps({
+            "type": "system_shutdown",
+            "reason": reason,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+        all_connections = []
+        for event_id, connections in self.active_connections.items():
+            all_connections.extend(connections)
+            
+        for connection in all_connections:
+            try:
+                # Send final message
+                await connection.send_text(final_message)
+                # Close the connection
+                await connection.close()
+            except:
+                pass
+                
+        # Clear all connections
+        self.active_connections.clear()
+
 manager = ConnectionManager()
 
 @router.websocket("/live/{event_id}")
@@ -158,3 +212,19 @@ async def broadcast_orderbook_update(event_id: int, update_data: dict):
         "timestamp": datetime.now().isoformat()
     })
     await manager.broadcast_to_event(message, event_id)
+
+# Function to close connections for a specific event
+async def close_event_connections(event_id: int, reason: str = "Event completed"):
+    """
+    Close all WebSocket connections for a specific event
+    Call this when an event is finalized/completed
+    """
+    await manager.close_event_connections(event_id, reason)
+
+# Function to close all connections (for system shutdown)
+async def close_all_connections(reason: str = "System shutdown"):
+    """
+    Close all active WebSocket connections
+    Call this during application shutdown or maintenance
+    """
+    await manager.close_all_connections(reason)

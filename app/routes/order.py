@@ -7,20 +7,41 @@ from sqlalchemy.orm import Session
 
 from ..schemas import order_schema, user_schema
 from ..model import order_model
-from ..service import auth, order , orderbook
+from ..service import auth, order , orderbook , event , user
 from ..database import get_db
+from ..enums import event_enums
 
 
 router = APIRouter(prefix="/orders")
+
+
+def validate_user(db:Session,user_id:int ,price:int , quant:int ):
+    curUser = user.get_user_by_id(db,user_id)
+
+    if curUser.current_balance >= price*quant:
+        return True
+
+    return False
+
+def is_event_active(db:Session , event_id:int):
+    curEnvent = event.get_event_by_id(db,event_id)
+
+    if curEnvent.status == event_enums.EventStatus.ONGOING:
+        return True
+    
+    return False
 
 @router.post("/", response_model=order_schema.Order)
 def create_order(order_data: order_schema.OrderCreate, 
                  current_user: user_schema.User = Depends(auth.get_current_user),
                  db: Session = Depends(get_db)):
-
-    # print("Creating order request received")
-    # print(order_data)
     
+    if not validate_user(db, current_user.id ,order_data.price , order_data.total_quantity):
+        return HTTPException("Insufficient balance")
+    
+    if not is_event_active(db,order_data.event_id):
+        return HTTPException("Event is completed")
+
     
     db_order = order.create_order(db, order_data, current_user.id)
 
@@ -38,7 +59,11 @@ def get_order(order_id: int,
               current_user: user_schema.User = Depends(auth.get_current_user),
               db: Session = Depends(get_db)):
     
-    db_order = order.get_order_by_id(db, order_id)
+    # take from memory
+    db_order = order.get_order_by_id_from_memory(order_id)
+
+    if db_order is None:
+        db_order = order.get_order_by_id(db, order_id)
     
     if not db_order:
         raise HTTPException(
@@ -73,17 +98,15 @@ def get_orders_by_event(event_id: int,
         # Admins can see all orders for an event
         return order.get_orders_by_event(db, event_id)
 
-@router.get("/active/", response_model=list[order_schema.Order])
-def get_active_orders(current_user: user_schema.User = Depends(auth.get_current_user),
-                      db: Session = Depends(get_db)):
-    
-    return order.get_active_orders_by_user(db, current_user.id)
 
 @router.put("/{order_id}", response_model=order_schema.Order)
 def update_order(order_id: int,
                  order_update: order_schema.OrderUpdate,
                  current_user: user_schema.User = Depends(auth.get_current_user),
                  db: Session = Depends(get_db)):
+    
+    if not is_event_active(db,order_data.event_id):
+        return HTTPException("Event is completed")
     
     db_order = order.get_order_by_id(db, order_id)
     

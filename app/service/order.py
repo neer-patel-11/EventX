@@ -4,6 +4,13 @@ from sqlalchemy import and_, or_
 from ..enums import order_enums
 from ..model import order_model
 from ..schemas import order_schema
+from redis_service import getFromMap
+
+
+def get_order_by_id_from_memory(order_id:int)->order_model.Order:
+    return getFromMap(order_id)
+
+
 
 def get_order_by_id(db: Session, order_id: int):
     """Get order by ID"""
