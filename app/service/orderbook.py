@@ -1,26 +1,25 @@
 from ..schemas import order_schema,trade_schema,user_schema,event_schema,portfolio_schema
 
-from redis_service import addLock,addToMap,getFromMap,isLocked,isQueueEmpty,peekToQueue,popToQueue,pushToQueue , removeLock , removeFromMap , updateMap
+from ..service.redis_service import addLock,addToMap,getFromMap,isLocked,isQueueEmpty,peekToQueue,popToQueue,pushToQueue , removeLock , removeFromMap , updateMap
 
 from fastapi import Depends
 
 from ..enums import order_enums , portfolio_enums
 
-from order import update_order
+from ..service.order import update_order
 
-from trade import create_trade
+from ..service.trade import create_trade
 
-from portfolio import create_portfolio , update_portfolio_quantity , get_portfolio_by_user_event_share
+from ..service.portfolio import create_portfolio , update_portfolio_quantity , get_portfolio_by_user_event_share
 
 from sqlalchemy.orm import Session
 
 from ..database import get_db
 
-from user import add_to_user_balance , deduct_from_user_balance
+from ..service.user import add_to_user_balance , deduct_from_user_balance
 
 import asyncio
 
-from ..routes.orderbook import broadcast_orderbook_update
 
 from typing import Dict, List, Optional
 
@@ -48,6 +47,8 @@ def addOrder(order:order_schema.Order):
     update_data = get_orderbook_update_data(order.event_id, db)
         
     # Broadcast to all connected clients for this event
+    from ..routes.orderbook import broadcast_orderbook_update
+
     asyncio.create_task(broadcast_orderbook_update(order.event_id, update_data))
      
 
@@ -84,6 +85,8 @@ def addOrderToQueue(order:order_schema.Order):
     db: Session = Depends(get_db)
 
     update_data = get_orderbook_update_data(order.event_id, db)
+    from ..routes.orderbook import broadcast_orderbook_update
+
     asyncio.create_task(broadcast_orderbook_update(order.event_id, update_data))
 
     
@@ -166,8 +169,10 @@ def addTrade(quant:int , price:int, order1:order_schema.Order , order2:order_sch
     if (order1.event_id != order2.event_id) or (order1.type_of_share != order2.type_of_share):
         return False
 
-    buyer_user_id = None , seller_user_id = None
-    buyer_order_id = None , seller_order_id = None
+    buyer_user_id = None 
+    seller_user_id = None
+    buyer_order_id = None 
+    seller_order_id = None
 
 
     if(order1.side == order_enums.OrderSide.BUY and order2.side == order_enums.OrderSide.SELL):
@@ -230,6 +235,8 @@ def addTrade(quant:int , price:int, order1:order_schema.Order , order2:order_sch
 
 
     update_data = get_orderbook_update_data(order1.event_id, db)
+    from ..routes.orderbook import broadcast_orderbook_update
+
     asyncio.create_task(broadcast_orderbook_update(order1.event_id, update_data))
 
     

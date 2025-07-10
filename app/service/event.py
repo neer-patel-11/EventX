@@ -2,12 +2,12 @@ from sqlalchemy.orm import Session
 
 from ..schemas import event_schema , portfolio_schema , trade_schema , order_schema
 from ..model import event_model , user_model
-from portfolio import get_portfolios_by_event , create_portfolio
-from trade import create_trade
-from user import add_to_user_balance , deduct_from_user_balance
+from ..service.trade import create_trade
+from ..service.portfolio import get_portfolios_by_event , create_portfolio
+from ..service.user import add_to_user_balance , deduct_from_user_balance
 from ..enums import portfolio_enums , event_enums , trade_enums , order_enums
-from order import cancel_order , get_active_orders_by_event , create_order
-from redis_service import removeFromMap , freeQueue
+from ..service.order import cancel_order , get_active_orders_by_event , create_order
+from ..service.redis_service import removeFromMap , freeQueue
 import asyncio
 from ..routes import orderbook  
 
