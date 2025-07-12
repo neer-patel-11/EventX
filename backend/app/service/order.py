@@ -1,10 +1,12 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..enums import order_enums
 from ..model import order_model
 from ..schemas import order_schema
 from ..service.redis_service import getFromMap
+from ..service.orderbook import addOrder
 
 
 def get_order_by_id_from_memory(order_id:int)->order_model.Order:
@@ -75,6 +77,12 @@ def create_order(db: Session, order_data: order_schema.OrderCreate, user_id: int
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
+
+    result = addOrder(db_order)
+
+    if result == False:
+        delete_order(db,db_order.id)
+        return HTTPException("Not able to place the order")
 
     return db_order
 

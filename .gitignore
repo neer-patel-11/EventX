@@ -1,4 +1,4 @@
-venv
-alembic
-.env
-alembic.ini
+backend\venv
+backend\alembic
+backend\.env
+backend\alembic.ini

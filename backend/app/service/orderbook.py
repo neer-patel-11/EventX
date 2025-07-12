@@ -53,6 +53,7 @@ def addOrder(order:order_schema.Order):
      
 
     if updatedOrder.filled_quantity == updatedOrder.total_quantity :
+        removeFromMap(updatedOrder.id)
         return persistOrderInDb(updatedOrder)
          
     else:
@@ -62,7 +63,7 @@ def addOrder(order:order_schema.Order):
             updatedOrder.status = order_enums.OrderStatus.PARTIALFILLED
 
         # add to queue
-
+        
         return addOrderToQueue(updatedOrder)
 
 

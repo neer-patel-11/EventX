@@ -58,11 +58,11 @@ def event_completed(db:Session,event_id:int,event:event_schema.EventUpdate , adm
     # cancel all the current incompleted order's -> free memory
     cancel_all_order(db,event_id)
 
-    free_all_queue(db,event_id)
+    free_all_queue(event_id)
 
     return True
 
-def free_all_queue(db:Session,event_id:int):
+def free_all_queue(event_id:int):
     for i in range(1,11):
         freeQueue(getQueueName(event_id,order_enums.OrderSide.BUY,order_enums.OrderShareType.NO , i))
         freeQueue(getQueueName(event_id,order_enums.OrderSide.BUY,order_enums.OrderShareType.YES , i))
@@ -99,7 +99,7 @@ def remove_from_portfolio(db:Session ,event_id:int , event: event_schema.EventUp
             type_of_share = trade_enums.TradeShareType.YES
 
             if portfolio.type_of_share == portfolio_enums.ShareType.NO :
-                type_of_share = trade_enums.TradeShareType.No
+                type_of_share = trade_enums.TradeShareType.NO
 
             # both are on same side
             trade_data = trade_schema.TradeCreate(
@@ -135,7 +135,7 @@ def remove_from_portfolio(db:Session ,event_id:int , event: event_schema.EventUp
             type_of_share = trade_enums.TradeShareType.YES
 
             if portfolio.type_of_share == portfolio_enums.ShareType.NO :
-                type_of_share = trade_enums.TradeShareType.No
+                type_of_share = trade_enums.TradeShareType.NO
 
 
             # both are on same side
@@ -167,7 +167,7 @@ def remove_from_portfolio(db:Session ,event_id:int , event: event_schema.EventUp
             type_of_share = trade_enums.TradeShareType.YES
 
             if portfolio.type_of_share == portfolio_enums.ShareType.NO :
-                type_of_share = trade_enums.TradeShareType.No
+                type_of_share = trade_enums.TradeShareType.NO
 
 
             # both are on same side

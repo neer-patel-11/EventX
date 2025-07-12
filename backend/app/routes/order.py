@@ -45,11 +45,6 @@ def create_order(order_data: order_schema.OrderCreate,
     
     db_order = order.create_order(db, order_data, current_user.id)
 
-    result = orderbook.addOrder(db_order)
-
-    if result == False:
-        order.delete_order(db,db_order.id)
-        return HTTPException("Not able to place the order")
     
     return db_order
 
