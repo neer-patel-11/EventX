@@ -1,4 +1,5 @@
 backend\venv
-backend\alembic
-backend\.env
-backend\alembic.ini
+backend/alembic
+backend/.env
+backend/alembic.ini
+

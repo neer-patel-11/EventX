@@ -6,7 +6,6 @@ from fastapi import Depends
 
 from ..enums import order_enums , portfolio_enums
 
-from ..service.order import update_order
 
 from ..service.trade import create_trade
 
@@ -293,6 +292,9 @@ def persistOrderInDb(updatedOrder:order_schema.Order):
                 side= updatedOrder.side,
                 status= updatedOrder.status
             )
+
+            from ..service.order import update_order
+
 
             update_order(db,updatedOrder.id,updateOrderObj)
         
